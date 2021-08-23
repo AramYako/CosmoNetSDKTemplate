@@ -31,19 +31,20 @@ namespace CosmoNetSDKRestfulAPI
         {
 
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "CosmoNetSDKRestfulAPI", Version = "v1" });
             });
 
             CosmoDbModel cosmoModel = new CosmoDbModel();
+
             Configuration.GetSection(CosmoDbModel.Section).Bind(cosmoModel);
 
             CosmosClient cosmoClient = new CosmosClient(cosmoModel.CosmoDbEndPoint, cosmoModel.CosmoMasterKey);
 
             services.AddSingleton(s =>
             {
-                var connectionString = Configuration["CosmosDBConnection"];
                 if (string.IsNullOrEmpty(cosmoModel?.CosmoDbEndPoint))
                 {
                     throw new InvalidOperationException(
@@ -75,7 +76,7 @@ namespace CosmoNetSDKRestfulAPI
             app.UseRouting();
 
             app.UseAuthorization();
-
+             
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

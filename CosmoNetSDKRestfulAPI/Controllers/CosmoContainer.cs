@@ -23,7 +23,7 @@ namespace CosmoNetSDKRestfulAPI.Controllers
         public async Task<ActionResult> GetContainers(string databaseId)
         {
             Database database = this._CosmoClient.GetDatabase(databaseId);
-
+            
             FeedResponse<ContainerProperties> containers = await database
                 .GetContainerQueryIterator<ContainerProperties>()
                 .ReadNextAsync();
@@ -70,6 +70,8 @@ namespace CosmoNetSDKRestfulAPI.Controllers
         [HttpPost("{throughtPut:int}/{partitionKey}")]
         public async Task<ActionResult> CreateContainer(string databaseId,string containerId, int throughtPut, string partitionKey)
         {
+            //partitionKey => /address/zipcode
+
             partitionKey = partitionKey.Replace("%2F", "/");
 
             Database database = this._CosmoClient.GetDatabase(databaseId);

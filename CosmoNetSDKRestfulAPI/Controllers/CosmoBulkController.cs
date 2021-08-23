@@ -31,22 +31,30 @@ namespace CosmoNetSDKRestfulAPI.Controllers
             var cosmoObj = new List<CosmoFamiliy>()
             {
                 new CosmoFamiliy(){ Id = Guid.NewGuid().ToString()},
+
                 new CosmoFamiliy(){ Id = Guid.NewGuid().ToString()}
 
             };
+
+
 
             var tasks = new List<Task>();
 
             foreach (var item in cosmoObj)
             {
                 var task = this._Container.CreateItemAsync(item, new PartitionKey(item.Id));
-                tasks.Add(task.ContinueWith(t=> { 
-                
-                    if(t.Status == TaskStatus.Faulted)
-                        Console.WriteLine("Instance crashed" + t);
+
+                tasks.Add(task.ContinueWith(t=> {
+
+                    //If faulted it will crash to down here
+                    if (t.Status == TaskStatus.Faulted)
+                        Console.WriteLine("Instance crashed" + t.Exception.Message);
+                    else if(t.Status == TaskStatus.RanToCompletion)
+                        Console.WriteLine($"Ran to completetion {t.Result.RequestCharge}");
                 }));
             }
 
+            //Ran everything async 
             await Task.WhenAll(tasks);
 
             return Ok();

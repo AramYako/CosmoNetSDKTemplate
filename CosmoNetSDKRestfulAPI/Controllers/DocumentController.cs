@@ -19,6 +19,7 @@ namespace CosmoNetSDKRestfulAPI.Controllers
         public DocumentController(CosmosClient CosmosClient)
         {
             this._CosmoClient = CosmosClient;
+
             this._Container = CosmosClient.GetContainer("Families", "Families");
         }
 
@@ -78,11 +79,13 @@ namespace CosmoNetSDKRestfulAPI.Controllers
             var requestOption = new QueryRequestOptions()
             {
                 PartitionKey = new PartitionKey(partitionKey)
+                
             };
 
 
             var result = await this._Container.
                 GetItemLinqQueryable<CosmoFamiliy>(false, null, requestOption)
+                .Where(f=> f.Id == id)
                 .ToFeedIterator()
                 .ReadNextAsync();
 
@@ -109,6 +112,7 @@ namespace CosmoNetSDKRestfulAPI.Controllers
         public async Task<ActionResult<CosmoFamiliy>> CreateDocument(CosmoFamiliy familiyModel)
         {
             familiyModel.Id = Guid.NewGuid().ToString();
+
             ItemResponse<CosmoFamiliy> response = await this._Container
                 .CreateItemAsync
                 (familiyModel, new PartitionKey(familiyModel.Address.ZipCode));

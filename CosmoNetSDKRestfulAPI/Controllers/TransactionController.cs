@@ -18,21 +18,23 @@ namespace CosmoNetSDKRestfulAPI.Controllers
         public TransactionController(CosmosClient CosmosClient)
         {
             this._CosmoClient = CosmosClient;
+
             this._Container = CosmosClient.GetContainer("Families", "Families");
         }
 
         [HttpPost]
-        public async Task CreateBulk()
+        public async Task ExecuteTransaction()
         {
             string PkValue = Guid.NewGuid().ToString();
 
             var cosmoObj = new List<CosmoFamiliy>()
             {
                 new CosmoFamiliy(){ Id = Guid.NewGuid().ToString(), Pk=PkValue },
+
                 new CosmoFamiliy(){ Id = Guid.NewGuid().ToString(),  Pk=PkValue}
             };
 
-            var batch = this._Container.CreateTransactionalBatch(new PartitionKey(PkValue));
+            TransactionalBatch batch = this._Container.CreateTransactionalBatch(new PartitionKey(PkValue));
           
             foreach(var item in cosmoObj)
                 batch.CreateItem(item);
@@ -45,7 +47,7 @@ namespace CosmoNetSDKRestfulAPI.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-
+                // The transaction success
             }
             else
             {
